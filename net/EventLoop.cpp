@@ -6,13 +6,14 @@
 #include <muduo/base/Logging.h>
 #include<assert.h>
 #include "Poller.h"
+#include"Epoller.h"
 namespace mal{
     const int kPollTimeMs = 10;
     __thread EventLoop* t_loopInThisThread=0;
     EventLoop::EventLoop()
         :looping_(false),
         threadId__(std::this_thread::get_id()),
-        poller_(new Poller(this)),
+        poller_(new Epoller(this)),
         callingPendingFunctor_(false){
         LOG_TRACE<<"EventLoop create" <<this<<"in thread";
         if(t_loopInThisThread){
@@ -35,7 +36,7 @@ namespace mal{
 
         while (!quit_){
             activeChannels_.clear();
-            muduo::Timestamp timestamp=
+            TimeStamp timestamp=
                     poller_->poll(kPollTimeMs,&activeChannels_);
 
             eventHanding_= true;

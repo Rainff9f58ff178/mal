@@ -10,7 +10,7 @@ namespace mal{
 
 
     TcpServer::TcpServer(EventLoop *loop,
-                         InetAddress &addr,
+                         const InetAddress &addr,
                          std::string name):
         loop_(loop), acceptor_(new Acceptor(loop,addr)),
         nextConnId_(0),name_(name),
@@ -87,6 +87,9 @@ namespace mal{
         threadInitCallback_=cb;
     }
 
+    EventLoop* TcpServer::getLoop() {
+        return loop_;
+    }
 
 
 }

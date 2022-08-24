@@ -10,7 +10,8 @@
 #include<netinet/in.h>
 namespace mal{
     namespace sockets{
-
+        int createNonBlockSocket(sa_family_t family);
+        int connect(int sockfd,const sockaddr* addr);
         struct sockaddr_in getLocalAddr(int sockfd);
 
         void toIpPort(char* buf, size_t size,

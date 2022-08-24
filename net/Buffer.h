@@ -24,20 +24,25 @@ namespace mal{
         { return &*buffer_.begin(); }
         void retrieve(int);
         void retrieveAll();
-        std::string retrieveAsString();
+        std::string retrieveAsString(int len);
         void append(const char*,int);
+        void append(const std::string& msg);
         void prepend(const void*,int);
         void hasWritten(size_t n);
         void ensureWritableBytes(size_t len);
+        const char* beginWrite()const;
         char* beginWrite();
         void makeSpace(int len);
         const char* begin() const;
-
+        const char* findCRLF()const;
+        const char* findCRLF(const char* start)const;
+        void retrieveUntil(const char* end);
 
     private:
         std::vector<char> buffer_;
         size_t writeIndex_;
         size_t readindex_;
+        static const char CRLF[];
 
     };
 

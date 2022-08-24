@@ -16,19 +16,19 @@ namespace mal{
     class TcpServer {
 
     public:
-        TcpServer(EventLoop* loop,InetAddress& addr,std::string name);
+        TcpServer(EventLoop* loop,const InetAddress& addr,std::string name);
 
         void start();
         void setOnConnectionCallback_(const ConnectionCallback& cb);
         void setOnMessageCallback(const MessageCallback& cb);
         void setThreadInitCallback_(const ThreadInitCallback& cb);
-        void newConnection(int fd,const InetAddress& addr);
-        void removeConnection(const TcpConnectionPtr& tcpConnection);
-        void removeConnectionInLoop(const TcpConnectionPtr& tcpConnection);
+        EventLoop* getLoop();
         void setThreadNums(int n);
     private:
         typedef std::map<std::string,TcpConnectionPtr > ConnectionMap;
-
+        void newConnection(int fd,const InetAddress& addr);
+        void removeConnection(const TcpConnectionPtr& tcpConnection);
+        void removeConnectionInLoop(const TcpConnectionPtr& tcpConnection);
 
         ConnectionCallback onConnectionCallback_;
         MessageCallback  onMessageCallback_;

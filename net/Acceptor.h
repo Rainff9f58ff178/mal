@@ -20,7 +20,7 @@ namespace mal{
                 const InetAddress& listenAdd)>
                 newConnectionCallback;
         Acceptor(EventLoop* loop,
-                 InetAddress& listenAddr);
+                 const InetAddress& listenAddr);
 
 
 

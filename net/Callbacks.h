@@ -10,10 +10,11 @@
 namespace mal{
     class TcpConnection;
     class Buffer;
+    class TimeStamp;
     typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
     typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback;
     typedef std::function<void (const TcpConnectionPtr& ,
-                                Buffer*,int)> MessageCallback;
+                                Buffer*,TimeStamp)> MessageCallback;
     typedef std::function<void (const TcpConnectionPtr&)> CloseCallback;
     typedef  std::function<void()> TimerCallback;
     typedef std::function<void (const TcpConnectionPtr&)> WriteCompleteCallback;

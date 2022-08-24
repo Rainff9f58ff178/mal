@@ -6,7 +6,7 @@
 #include "EventLoop.h"
 
 mal::Acceptor::Acceptor(mal::EventLoop *loop,
-                        mal::InetAddress &listenAddr):
+                        const mal::InetAddress &listenAddr):
                         loop_(loop),
                         acceptSocket_(sockets::createNonBlockOrDie()),
                         acceptChannel_(loop,acceptSocket_.fd()),

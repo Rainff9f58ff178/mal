@@ -10,13 +10,15 @@
 #include"EventLoop.h"
 #include<muduo/base/Logging.h>
 #include "SocketsOps.h"
+#include "HttpContext.h"
+#include"TimeStamp.h"
 namespace mal{
 
     void TcpConnection::handleRead() {
         int savedError=0;
         ssize_t  n = inputBuffer_.readFd(channel_->fd(),&savedError);
         if(n>0)
-            messageCallback_(shared_from_this(),&inputBuffer_,n);
+            messageCallback_(shared_from_this(),&inputBuffer_,TimeStamp());
         else if(n==0)
             handleClose();
         else{
@@ -57,8 +59,6 @@ namespace mal{
 
     void TcpConnection::connectEstablished() {
         channel_->enableReading();
-        //TODO:neek enableFunc ? not sure need enableWriting ,
-        // muduo doesn't enable
         state_=Connected;
         connectionCallback_(shared_from_this());
     }
@@ -136,46 +136,34 @@ namespace mal{
             socket_->shutdownWrite();
     }
 
-    void TcpConnection::send(std::string &message, size_t len) {
+    void TcpConnection::send(std::string &message) {
         if(state_==Connected){
             if(loop_->isInloopThread())
-                sendInLoop(message);
+                sendInLoop(message.data(),message.size());
             else
                 loop_->runInQueenWhileAfterHandle(std::bind(
-                        &TcpConnection::sendInLoop,
-                        this,
-                        message));
+                        &TcpConnection::sendInLoop,this,message.data(),message.size()));
+        }
+    }
+    void TcpConnection::send(Buffer *buf) {
+        if (state_ == Connected)
+        {
+            if (loop_->isInloopThread())
+            {
+                sendInLoop(buf->peek(), buf->readableBytes());
+                buf->retrieveAll();
+            }
+            else
+            {
+                loop_->runInLoopImmediately(
+                        std::bind(&TcpConnection::sendInLoop,
+                                  this,     // FIXME
+                                  buf->peek(),buf->readableBytes()));
+                //std::forward<string>(message)));
+            }
         }
     }
 
-    void TcpConnection::sendInLoop(std::string &message) {
-        loop_->assertInLoopThread();
-        /*
-         * we must wait channel_ doesn't monitoring
-         * kWriteevnt and outputBuffer.raedableBytes==0
-         * to ensure data is ordered.
-         * */
-        ssize_t nwrote=0;
-        if(!channel_->isWriting() && outputBuffer_.readableBytes()==0){
-            nwrote = ::write(channel_->fd(),message.data(),message.size());
-            if(nwrote >=0 ){
-                if(muduo::implicit_cast<size_t>(nwrote) < message.size())
-                    LOG_TRACE <<" need write more data";
-                else if (writeCompleteCallback_)
-                    writeCompleteCallback_(shared_from_this());
-            }else{
-                nwrote=0;
-                LOG_SYSERR<<"TcpConnection::sendInLoop";
-            }
-        }
-        assert(nwrote > 0);
-        if(muduo::implicit_cast<size_t>(nwrote) < message.size()){
-            outputBuffer_.append(message.data()+nwrote,
-                                 message.size()-nwrote);
-            if(!channel_->isWriting())
-                channel_->enableWriting();
-        }
-    }
 
     void TcpConnection::setTcpNoDelay(bool on) {
         socket_->setTcoNoDelay(on);
@@ -187,6 +175,75 @@ namespace mal{
 
     void TcpConnection::setHighWaterMarkCallback(HighWaterMarkCallback &cb) {
         highWaterMarkCallback_=cb;
+    }
+
+    void TcpConnection::setHttpContext(const boost::any &httpContext) {
+        httpContext_=httpContext;
+    }
+
+    const boost::any &TcpConnection::getContext() const {
+        return httpContext_;
+    }
+
+    boost::any* TcpConnection::getMutableContext() {
+        return &httpContext_;
+    }
+
+
+
+    void TcpConnection::sendInLoop(const char *data, size_t len) {
+        loop_->assertInLoopThread();
+        ssize_t nwrote = 0;
+        size_t remaining = len;
+        bool faultError = false;
+        if (state_ == Disconnected)
+        {
+            LOG_WARN << "disconnected, give up writing";
+            return;
+        }
+        // if no thing in output queue, try writing directly
+        if (!channel_->isWriting() && outputBuffer_.readableBytes() == 0)
+        {
+            nwrote = write(channel_->fd(), data, len);
+            if (nwrote >= 0)
+            {
+                remaining = len - nwrote;
+                if (remaining == 0 && writeCompleteCallback_)
+                {
+                    loop_->runInQueenWhileAfterHandle(std::bind(writeCompleteCallback_, shared_from_this()));
+                }
+            }
+            else // nwrote < 0
+            {
+                nwrote = 0;
+                if (errno != EWOULDBLOCK)
+                {
+                    LOG_SYSERR << "TcpConnection::sendInLoop";
+                    if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
+                    {
+                        faultError = true;
+                    }
+                }
+            }
+        }
+
+        assert(remaining <= len);
+        if (!faultError && remaining > 0)
+        {
+            //TODO:highWaterCallback
+//            size_t oldLen = outputBuffer_.readableBytes();
+//            if (oldLen + remaining >= highWaterMark_
+//                && oldLen < highWaterMark_
+//                && highWaterMarkCallback_)
+//            {
+//                loop_->queueInLoop(std::bind(highWaterMarkCallback_, shared_from_this(), oldLen + remaining));
+//            }
+            outputBuffer_.append(data+nwrote, remaining);
+            if (!channel_->isWriting())
+            {
+                channel_->enableWriting();
+            }
+        }
     }
 
 

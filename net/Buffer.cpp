@@ -7,8 +7,11 @@
 #include<cassert>
 #include <cerrno>
 #include <sys/uio.h>
+#include<algorithm>
 namespace mal{
 
+
+    const char Buffer::CRLF[] = "\r\n";
 
     Buffer::Buffer(size_t initialSize):
             writeIndex_(CheapPrepend),
@@ -73,6 +76,11 @@ namespace mal{
         hasWritten(size);
     }
 
+
+    void Buffer::append(const std::string &msg) {
+        append(msg.data(),msg.size());
+    }
+
     void Buffer::ensureWritableBytes(size_t len) {
         if(writeableBytes() < len )
             makeSpace(len);
@@ -95,7 +103,7 @@ namespace mal{
         }
     }
 
-    char *Buffer::beginWrite() {
+    const char *Buffer::beginWrite() const {
         return begin()+writeIndex_;
     }
 
@@ -120,4 +128,35 @@ namespace mal{
         readindex_ = CheapPrepend;
         writeIndex_ = CheapPrepend;
     }
+
+    const char *Buffer::findCRLF() const {
+        const char* crlf = std::search(peek(),beginWrite(),CRLF,CRLF+2);
+        return crlf == beginWrite() ? nullptr : crlf;
+    }
+
+    const char *Buffer::findCRLF(const char *start) const {
+        assert(peek() <= start);
+        assert(start <= beginWrite());
+        const char* crlf = std::search(start, beginWrite(), CRLF, CRLF+2);
+        return crlf == beginWrite() ? NULL : crlf;
+    }
+
+    void Buffer::retrieveUntil(const char *end) {
+
+        retrieve(end-peek());
+    }
+
+    char *Buffer::beginWrite() {
+        return &*begin()+writeIndex_;
+    }
+
+    std::string Buffer::retrieveAsString(int len) {
+        std::string s(peek(),peek()+len);
+        if(!s.empty()){
+            retrieve(len);
+        }
+        return s;
+    }
+
+
 }

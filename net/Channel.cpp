@@ -47,6 +47,7 @@ namespace mal{
     }
 
     int Channel::fd() const {
+
         return fd_;
     }
 

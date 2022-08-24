@@ -19,6 +19,7 @@ namespace mal{
          * 他不必是heap对象
          * */
     class Poller;
+    class Epoller;
     class Channel;
     class EventLoop :boost::noncopyable {
     public:
@@ -61,7 +62,7 @@ namespace mal{
 
         bool eventHanding_;
 
-        boost::scoped_ptr<Poller> poller_;
+        boost::scoped_ptr<Epoller> poller_;
 
         ChannelList activeChannels_;
 

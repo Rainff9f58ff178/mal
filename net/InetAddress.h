@@ -32,9 +32,10 @@ namespace mal{
             addr_=addr;
         }
         InetAddress(const InetAddress& other);
-        sockaddr_in& addr(){return addr_;}
-        sockaddr_in getAddr()const {return addr_;}
-        const struct sockaddr* getSockAddr() const { return sockets::sockaddr_cast(&addr6_); }
+        const sockaddr* addr(){return sockets::sockaddr_cast(&addr_);}
+
+        const struct sockaddr* getSockAddr6() const { return sockets::sockaddr_cast(&addr6_); }
+        sa_family_t family(){return addr_.sin_family;}
     private:
         struct sockaddr_in addr_;
         struct sockaddr_in6 addr6_;

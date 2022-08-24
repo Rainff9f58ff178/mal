@@ -14,7 +14,6 @@ mal::InetAddress::InetAddress(
     addr_.sin_port = htons(port);
     addr_.sin_family=AF_INET;
     addr_.sin_addr.s_addr=INADDR_ANY;
-
 }
 
 mal::InetAddress::InetAddress(

@@ -19,7 +19,7 @@ mal::Socket::~Socket() {
 }
 
 void mal::Socket::bindAddresss(mal::InetAddress addr){
-    bind(fd_,(sockaddr*)&addr.addr(),sizeof(sockaddr));
+    bind(fd_,addr.addr(),sizeof(sockaddr));
 }
 
 void mal::Socket::listen() {

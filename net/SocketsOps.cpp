@@ -47,8 +47,12 @@ namespace mal{
         assert(size > end);
         snprintf(buf+end, size-end, ":%u", port);
     }
-    void sockets::toIp(char *buf, size_t size, const struct sockaddr_in *addr) {
-        ::inet_ntop(AF_INET, &addr->sin_addr, buf, static_cast<socklen_t>(size));
+    void sockets::toIp(char *buf, size_t size,
+                       const struct sockaddr_in *addr) {
+        ::inet_ntop(AF_INET,
+                    &addr->sin_addr,
+                    buf,
+                    static_cast<socklen_t>(size));
     }
 
 
@@ -62,7 +66,8 @@ namespace mal{
         {
             struct sockaddr_in localaddr;
             memset(&localaddr,0, sizeof localaddr);
-            socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
+            socklen_t addrlen =
+                    static_cast<socklen_t>(sizeof localaddr);
             if (::getsockname(sockfd,
                               (sockaddr*)&localaddr,
                               &addrlen) < 0){
@@ -74,8 +79,12 @@ namespace mal{
 
     int sockets::getSockErr(int sockfd) {
         int optval;
-        socklen_t optlen = static_cast<socklen_t >(sizeof(optval));
-        if(::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) <0)
+        socklen_t optlen =
+                static_cast<socklen_t >(sizeof(optval));
+        if(::getsockopt(sockfd,
+                        SOL_SOCKET,
+                        SO_ERROR,
+                        &optval, &optlen) <0)
             return errno;
         else
             return optval;
@@ -85,6 +94,15 @@ namespace mal{
         if(::shutdown(sockfd,SHUT_WR) < 0){
             LOG_SYSERR << "sockets::shutdownWrite(int sockfd)";
         }
+    }
+
+    int sockets::createNonBlockSocket(sa_family_t family) {
+        int sock= socket(AF_INET,
+                         SOCK_STREAM |SOCK_NONBLOCK,
+                         IPPROTO_TCP);
+        if (sock < 0)
+            LOG_SYSFATAL << "CreateNonBlockSocket";
+        return sock;
     }
 
 }//namespace mal
