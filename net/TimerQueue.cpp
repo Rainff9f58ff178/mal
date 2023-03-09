@@ -4,11 +4,11 @@
 #include"TimerQueue.h"
 #include<sys/timerfd.h>
 
-#include<muduo/base/Logging.h>
 #include"Channel.h"
 #include"EventLoop.h"
 #include<memory>
 #include <iostream>
+#include <string.h>
 namespace mal{
 
     TimerQueue::TimerQueue(EventLoop *loop) :loop_(loop),timerfd_(createNonBlockTimerFd()), timerfdChannel_(new Channel(loop,timerfd_))
@@ -21,12 +21,22 @@ namespace mal{
 
     }
 
+    /*
+     *
+     * @param when:mill second;
+     * */
     int64_t TimerQueue::addTimer(const TimerCallback &cb, TimeStamp when) {
         Timer* timer = new Timer(cb,when,0,seuqence_++);
         loop_->runInLoopImmediately(
                 std::bind(&TimerQueue::addTimerInLoop, this,timer));
         return  seuqence_;
     }
+
+    /*
+     * @param when :mill second
+     * @parm interval :mill second
+     * */
+
     int64_t TimerQueue::addTimerRepeat(const TimerCallback &cb, TimeStamp when, double interval) {
         Timer* timer = new Timer(cb,when,interval,seuqence_++);
         loop_->runInLoopImmediately(
@@ -49,7 +59,6 @@ namespace mal{
         loop_->assertInLoopThread();
         bool queueChanged=insert(timer);
         if(queueChanged) {
-
             std::shared_ptr<Timer> timer = queue.top().second;
             update(timer,timerfd_);
         }
@@ -83,7 +92,6 @@ namespace mal{
     std::vector<std::shared_ptr<Timer>> TimerQueue::getExpired(int64_t milliTime) {
         std::vector<std::shared_ptr<Timer>> timer_v;
         while(queue.top().first.getMillionSecond() <= milliTime ){
-
             timer_v.push_back(std::move(queue.top().second));
             queue.pop();
             if(queue.empty())
@@ -100,13 +108,14 @@ namespace mal{
     int TimerQueue::createNonBlockTimerFd() {
         int  fd=timerfd_create(CLOCK_MONOTONIC,TFD_CLOEXEC |TFD_NONBLOCK);
         if(fd < 0){
-            LOG_SYSFATAL << " TimerQueue::createNonBlockTimerFd() fail ";
+//            LOG_SYSFATAL << " TimerQueue::createNonBlockTimerFd() fail ";
         }
         return fd;
     }
 
     void TimerQueue::update(std::shared_ptr<Timer> timer, int timerfd) {
         TimeStamp stamp=timer->getExpiration();
+        int64_t interval =timer->getInterval();
         itimerspec newValue;
         itimerspec oldValue;
         bzero(&newValue,sizeof newValue);
@@ -114,8 +123,10 @@ namespace mal{
         newValue.it_value.tv_sec=(stamp.getMillionSecond()-TimeStamp::nowMilli()) /1000;;
         newValue.it_value.tv_nsec= ((stamp.getMillionSecond()-TimeStamp::nowMilli()) % 1000) *1000000;;
         if(timer->getInterval()!=0){
-            newValue.it_interval.tv_sec=(stamp.getMillionSecond()-TimeStamp::nowMilli()) /1000;
-            newValue.it_interval.tv_nsec=((stamp.getMillionSecond()-TimeStamp::nowMilli()) % 1000) *1000000;;
+//            newValue.it_interval.tv_sec=(stamp.getMillionSecond()-TimeStamp::nowMilli()) /1000; wrong
+            newValue.it_interval.tv_sec=(interval) /1000;
+//            newValue.it_interval.tv_nsec=((stamp.getMillionSecond()-TimeStamp::nowMilli()) % 1000) *1000000;; wrong
+            newValue.it_interval.tv_nsec=(interval % 1000) *1000000;;
         }
         timerfd_settime(timerfd,0,&newValue,&oldValue);
     }

@@ -4,12 +4,12 @@
 
 #include "Epoller.h"
 #include "Type.h"
-#include<muduo/base/Logging.h>
 namespace mal{
     const int NEW = -1;
     const int ADDED = 1;
 
-    Epoller::Epoller(EventLoop *loop):loop_(loop),epollfd_(::epoll_create1(EPOLL_CLOEXEC)),events_(InitEventListSize) {
+    Epoller::Epoller(EventLoop *loop):loop_(loop),
+    epollfd_(::epoll_create1(EPOLL_CLOEXEC)),events_(InitEventListSize) {
 
     }
 
@@ -20,16 +20,19 @@ namespace mal{
     TimeStamp Epoller::poll(int timeoutMs, Epoller::ChannelList *activeChannels) {
         int numEvents =::epoll_wait(epollfd_,&*events_.begin(),static_cast<int>(events_.size()),timeoutMs);
         if(numEvents > 0){
-            LOG_TRACE <<  numEvents << "events happended";
+//            LOG_TRACE <<  numEvents << "events happended";
             fillActiveChannels(numEvents,activeChannels);
-            if(implicit_cast<size_t>(numEvents)==events_.size())
+            if(implicit_cast<size_t>(numEvents)==events_.size() && events_.size()<INT16_MAX);
+            if(events_.size()*2<=INT16_MAX){
                 events_.resize(events_.size()*2);
+            }else{
+                events_.resize(INT16_MAX);
+            }
         }
         return TimeStamp(0);
     }
 
     void Epoller::fillActiveChannels(int numEvents, Epoller::ChannelList *activeChannels) const {
-
         assert(implicit_cast<size_t>(numEvents) <= events_.size());
         for(int i=0 ; i< numEvents; ++i){
             Channel* channel = static_cast<Channel*>(events_[i].data.ptr);
@@ -67,7 +70,7 @@ namespace mal{
         e.events=channel->events();
         e.data.ptr=channel;
         if(epoll_ctl(epollfd_,operation,channel->fd(),&e) < 0){
-            LOG_FATAL<<" void Epoller::update(int operation, Channel *channel) fali ";
+//            LOG_FATAL<<" void Epoller::update(int operation, Channel *channel) fali ";
         }
     }
     void Epoller::assertInLoopThread() {

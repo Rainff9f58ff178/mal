@@ -9,7 +9,8 @@
 #include <cstring>
 #include<boost/implicit_cast.hpp>
 #include<cassert>
-#include<muduo/base/Logging.h>
+#include <error.h>
+#include <cerrno>
 
 namespace mal{
 
@@ -71,7 +72,7 @@ namespace mal{
             if (::getsockname(sockfd,
                               (sockaddr*)&localaddr,
                               &addrlen) < 0){
-                LOG_SYSERR << "sockets::getLocalAddr";
+//                LOG_SYSERR << "sockets::getLocalAddr";
             }
             return localaddr;
         }
@@ -92,7 +93,7 @@ namespace mal{
 
     void sockets::shutdownWrite(int sockfd) {
         if(::shutdown(sockfd,SHUT_WR) < 0){
-            LOG_SYSERR << "sockets::shutdownWrite(int sockfd)";
+//            LOG_SYSERR << "sockets::shutdownWrite(int sockfd)";
         }
     }
 
@@ -101,7 +102,7 @@ namespace mal{
                          SOCK_STREAM |SOCK_NONBLOCK,
                          IPPROTO_TCP);
         if (sock < 0)
-            LOG_SYSFATAL << "CreateNonBlockSocket";
+//            LOG_SYSFATAL << "CreateNonBlockSocket";
         return sock;
     }
 

@@ -6,7 +6,6 @@
 #include"EventLoop.h"
 #include"Channel.h"
 #include"InetAddress.h"
-#include<muduo/base/Logging.h>
 namespace mal{
 
     Connector::Connector(EventLoop *loop,
@@ -49,7 +48,7 @@ namespace mal{
         }
         else
         {
-            LOG_DEBUG << "do not connect";
+//            LOG_DEBUG << "do not connect";
         }
     }
 
@@ -82,12 +81,12 @@ namespace mal{
             case EBADF:
             case EFAULT:
             case ENOTSOCK:
-                LOG_SYSERR << "connect error in Connector::startInLoop " << savedErrno;
+//                LOG_SYSERR << "connect error in Connector::startInLoop " << savedErrno;
                 close(sockfd);
                 break;
 
             default:
-                LOG_SYSERR << "Unexpected error in Connector::startInLoop " << savedErrno;
+//                LOG_SYSERR << "Unexpected error in Connector::startInLoop " << savedErrno;
                 close(sockfd);
                 // connectErrorCallback_();
                 break;

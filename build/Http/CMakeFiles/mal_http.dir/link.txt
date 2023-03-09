@@ -1,0 +1,2 @@
+/usr/bin/ar qc /home/rain/src/muduo/malIO_uring/lib/libmal_http.a CMakeFiles/mal_http.dir/HttpServer.cpp.o CMakeFiles/mal_http.dir/HttpContext.cpp.o CMakeFiles/mal_http.dir/HttpRequest.cpp.o CMakeFiles/mal_http.dir/HttpResponse.cpp.o CMakeFiles/mal_http.dir/MIME_map.cpp.o
+/usr/bin/ranlib /home/rain/src/muduo/malIO_uring/lib/libmal_http.a

@@ -5,7 +5,6 @@
 #ifndef LINUXNETWORKPROGRAMCHENSHUO_TIMERQUEUE_H
 #define LINUXNETWORKPROGRAMCHENSHUO_TIMERQUEUE_H
 #include <boost/noncopyable.hpp>
-#include<muduo/base/Timestamp.h>
 #include<functional>
 #include<memory>
 #include<set>

@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "/home/rain/src/muduo/malIO_uring/lib/libmal_net.a"
+  "/home/rain/src/muduo/malIO_uring/lib/libmal_net.pdb"
+  "CMakeFiles/mal_net.dir/Acceptor.cpp.o"
+  "CMakeFiles/mal_net.dir/Acceptor.cpp.o.d"
+  "CMakeFiles/mal_net.dir/Buffer.cpp.o"
+  "CMakeFiles/mal_net.dir/Buffer.cpp.o.d"
+  "CMakeFiles/mal_net.dir/Channel.cpp.o"
+  "CMakeFiles/mal_net.dir/Channel.cpp.o.d"
+  "CMakeFiles/mal_net.dir/Connector.cpp.o"
+  "CMakeFiles/mal_net.dir/Connector.cpp.o.d"
+  "CMakeFiles/mal_net.dir/Epoller.cpp.o"
+  "CMakeFiles/mal_net.dir/Epoller.cpp.o.d"
+  "CMakeFiles/mal_net.dir/EventLoop.cpp.o"
+  "CMakeFiles/mal_net.dir/EventLoop.cpp.o.d"
+  "CMakeFiles/mal_net.dir/EventLoopThread.cpp.o"
+  "CMakeFiles/mal_net.dir/EventLoopThread.cpp.o.d"
+  "CMakeFiles/mal_net.dir/EventLoopThreadPool.cpp.o"
+  "CMakeFiles/mal_net.dir/EventLoopThreadPool.cpp.o.d"
+  "CMakeFiles/mal_net.dir/IgnoreSigpipe.cpp.o"
+  "CMakeFiles/mal_net.dir/IgnoreSigpipe.cpp.o.d"
+  "CMakeFiles/mal_net.dir/InetAddress.cpp.o"
+  "CMakeFiles/mal_net.dir/InetAddress.cpp.o.d"
+  "CMakeFiles/mal_net.dir/Poller.cpp.o"
+  "CMakeFiles/mal_net.dir/Poller.cpp.o.d"
+  "CMakeFiles/mal_net.dir/Socket.cpp.o"
+  "CMakeFiles/mal_net.dir/Socket.cpp.o.d"
+  "CMakeFiles/mal_net.dir/SocketsOps.cpp.o"
+  "CMakeFiles/mal_net.dir/SocketsOps.cpp.o.d"
+  "CMakeFiles/mal_net.dir/TcpConnection.cpp.o"
+  "CMakeFiles/mal_net.dir/TcpConnection.cpp.o.d"
+  "CMakeFiles/mal_net.dir/TcpServer.cpp.o"
+  "CMakeFiles/mal_net.dir/TcpServer.cpp.o.d"
+  "CMakeFiles/mal_net.dir/Timer.cpp.o"
+  "CMakeFiles/mal_net.dir/Timer.cpp.o.d"
+  "CMakeFiles/mal_net.dir/TimerQueue.cpp.o"
+  "CMakeFiles/mal_net.dir/TimerQueue.cpp.o.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/mal_net.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

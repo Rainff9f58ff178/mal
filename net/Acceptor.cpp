@@ -12,7 +12,7 @@ mal::Acceptor::Acceptor(mal::EventLoop *loop,
                         acceptChannel_(loop,acceptSocket_.fd()),
                         listening_(false){
     acceptSocket_.bindAddresss(listenAddr);
-    acceptChannel_.setReadCallback(std::bind(&Acceptor::handleRead,this));
+    acceptChannel_.setReadCallback(std::bind(&Acceptor::handleRead,this,std::placeholders::_1));
 }
 
 void mal::Acceptor::setNewConnectionCallback(
@@ -20,7 +20,7 @@ void mal::Acceptor::setNewConnectionCallback(
     newConnectionCallback_ = cb;
 }
 
-void mal::Acceptor::handleRead() {
+void mal::Acceptor::handleRead(io_uring& read_ring) {
     loop_->assertInLoopThread();
     InetAddress peerAddr(0);
 
@@ -33,6 +33,7 @@ void mal::Acceptor::handleRead() {
 }
 
 void mal::Acceptor::listen() {
+
     loop_->assertInLoopThread();
     acceptSocket_.listen();
     listening_= true;

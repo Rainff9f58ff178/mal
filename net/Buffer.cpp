@@ -8,6 +8,8 @@
 #include <cerrno>
 #include <sys/uio.h>
 #include<algorithm>
+#include <liburing.h>
+#include"log.h"
 namespace mal{
 
 
@@ -39,9 +41,8 @@ namespace mal{
         return &(*buffer_.begin());
     }
 
-    ssize_t Buffer:: readFd(int sockfd, int *savedError) {
+    io_uring_sqe* Buffer::readFd(int sockfd, int *savedError,::io_uring& read_ring) {
         // saved an ioctl()/FIONREAD call to tell how much to read
-        char extrabuf[65536];
         struct iovec vec[2];
         const size_t writable = writeableBytes();
         vec[0].iov_base = begin()+writeIndex_;
@@ -50,10 +51,17 @@ namespace mal{
         vec[1].iov_len = sizeof extrabuf;
         // when there is enough space in this buffer, don't read into extrabuf.
         // when extrabuf is used, we read 128k-1 bytes at most.
-        const ssize_t n = readv(sockfd, vec, 2);
+//        const ssize_t n = readv(sockfd, vec, 2);
+        auto sqe= io_uring_get_sqe(&read_ring);
+        io_uring_prep_readv(sqe,sockfd,vec,2,0);
+        return sqe;
+    }
+
+    void Buffer::readFdLater(int n){
+        const size_t writable = writeableBytes();
         if (n < 0)
         {
-            *savedError = errno;
+            CONSOLE_ERROR("void Buffer::readFdLater n <0 ");
         }
         else if (implicit_cast<size_t>(n) <= writable)
         {
@@ -64,9 +72,7 @@ namespace mal{
             writeIndex_ = buffer_.size();
             append(extrabuf, n - writable);
         }
-        return n;
     }
-
     void Buffer::append(const char * data, int size) {
         //make sure sufficient place to store surplus data
         ensureWritableBytes(size);

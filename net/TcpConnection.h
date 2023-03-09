@@ -12,6 +12,7 @@
 #include"Callbacks.h"
 #include "Buffer.h"
 #include<boost/any.hpp>
+#include "EventLoop.h"
 namespace mal{
     class Socket;
     class Channel;
@@ -39,7 +40,8 @@ namespace mal{
 
         void connectEstablished();
         void connectDestroyed();
-        void handleRead();
+        void handleRead(io_uring& read_ring);
+        void handleReadLater(int n);
         void handleWrite();
         void handleClose();
         void handleError();

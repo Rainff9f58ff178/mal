@@ -4,7 +4,10 @@
 #include "TimeStamp.h"
 #include<iostream>
 #include<chrono>
-#include<muduo/base/Logging.h>
+/*
+    @param time : mill second
+*/
+
 mal::TimeStamp::TimeStamp(const int64_t &time){
 
     std::chrono::time_point<std::chrono::system_clock> now =std::chrono::system_clock::now();

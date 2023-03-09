@@ -1,0 +1,1 @@
+/usr/bin/g++-11 CMakeFiles/main.dir/main.cpp.o -o main  -lstdc++ /home/rain/src/muduo/malIO_uring/lib/libmal_base.a /home/rain/src/muduo/malIO_uring/lib/libmal_net.a /home/rain/src/muduo/malIO_uring/lib/libmal_http.a -luring /home/rain/src/muduo/malIO_uring/lib/libmal_net.a /home/rain/src/muduo/malIO_uring/lib/libmal_http.a /home/rain/src/muduo/malIO_uring/lib/libmal_base.a 

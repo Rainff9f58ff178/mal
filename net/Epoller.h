@@ -8,6 +8,7 @@
 #include"Channel.h"
 #include<sys/epoll.h>
 #include "TimeStamp.h"
+#include <strings.h>
 namespace mal{
     class Epoller {
     public:

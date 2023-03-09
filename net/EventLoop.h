@@ -11,6 +11,7 @@
 #include "Poller.h"
 #include<memory>
 #include<mutex>
+#include<liburing.h>
 namespace mal{
     /*
          * one loop per thread 顾名思义就是每个线程只能有一个EventLoop对象 ，因此EventLoop的构造函数会检查当前线程是否已经创建了其他EventLoop对象
@@ -44,6 +45,12 @@ namespace mal{
         void updateChannel(Channel* channel);
         void quit();
         static EventLoop* getEventLoopOfCurrentThread();
+
+
+
+
+        struct ::io_uring read_ring_;
+        const int IO_URING_QUEUE_ENTRY_NUM;
     private:
         void abortNotInLoopThread();
         void callPendingFunction();
@@ -54,24 +61,16 @@ namespace mal{
         std::vector<Functor> pendingFunctors_;
         bool callingPendingFunctor_;
         bool looping_;
-
         bool quit_;
-
         const std::thread::id threadId__;
-
-
         bool eventHanding_;
-
         boost::scoped_ptr<Epoller> poller_;
-
         ChannelList activeChannels_;
 
 
         std::mutex mutex_;
 
-
     }; //class EventLoop
-
 
     extern  __thread EventLoop* t_loopInThisThread;
 

@@ -3,7 +3,7 @@
 //
 
 #include "EventLoopThreadPool.h"
-
+#include "type.h"
 namespace mal{
 
     EventLoopThreadPool::EventLoopThreadPool(EventLoop *loop,
@@ -40,7 +40,7 @@ namespace mal{
         if(!loops_.empty()){
             loop  = loops_[next_];
             ++next_;
-            if(muduo::implicit_cast<size_t>(next_) >= loops_.size())
+            if(mal::implicit_cast<size_t>(next_) >= loops_.size())
                 next_=0;
         }
         return loop;

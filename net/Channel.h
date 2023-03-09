@@ -8,6 +8,8 @@
 
 #include <boost/noncopyable.hpp>
 #include<functional>
+#include"EventLoop.h"
+#include<liburing.h>
 namespace mal{
     class EventLoop;
     class Channel:boost::noncopyable {
@@ -21,12 +23,11 @@ namespace mal{
          * */
     public:
         typedef std::function<void()> EventCallback;
-
+        typedef std::function<void(::io_uring& read_ring)> ReadEventCallback;
         Channel(EventLoop* loop,int fd);
         ~Channel();
         void handleEvent();
-
-        void setReadCallback(const EventCallback& cb);
+        void setReadCallback(const ReadEventCallback & cb);
         void setWriteCallback(const EventCallback& cb);
         void setErrorCallback(const EventCallback& cb);
         void setCloseCallback(const EventCallback& cb);
@@ -61,7 +62,7 @@ namespace mal{
         int index_;
 
         bool eventHanding_;
-        EventCallback readCallback_;
+        ReadEventCallback readCallback_;
         EventCallback writeCallback_;
         EventCallback errorCallback_;
         EventCallback closeCallback_;

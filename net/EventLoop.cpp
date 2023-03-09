@@ -3,10 +3,11 @@
 //
 
 #include "EventLoop.h"
-#include <muduo/base/Logging.h>
 #include<assert.h>
 #include "Poller.h"
 #include"Epoller.h"
+#include"TcpConnection.h"
+#include"log.h"
 namespace mal{
     const int kPollTimeMs = 10;
     __thread EventLoop* t_loopInThisThread=0;
@@ -14,13 +15,15 @@ namespace mal{
         :looping_(false),
         threadId__(std::this_thread::get_id()),
         poller_(new Epoller(this)),
-        callingPendingFunctor_(false){
-        LOG_TRACE<<"EventLoop create" <<this<<"in thread";
+        callingPendingFunctor_(false),
+        IO_URING_QUEUE_ENTRY_NUM(INT16_MAX){
+//        LOG_TRACE<<"EventLoop create" <<this<<"in thread";
         if(t_loopInThisThread){
-            LOG_FATAL<<"Another EventLoop"<<t_loopInThisThread
-                    <<"exists in this thread";
+//            LOG_FATAL<<"Another EventLoop"<<t_loopInThisThread
+//                    <<"exists in this thread";
         }else{
             t_loopInThisThread=this;
+            io_uring_queue_init(IO_URING_QUEUE_ENTRY_NUM, &read_ring_, 0);
         }
     }
     EventLoop::~EventLoop() {
@@ -44,10 +47,19 @@ namespace mal{
                     ;  it!=activeChannels_.end()
                     ; ++it )
                 (*it)->handleEvent();
+            io_uring_submit(&read_ring_);
+            io_uring_cqe* cqe;
+
+            while(io_uring_peek_cqe(&read_ring_,&cqe)==0){
+                CONSOLE_INFO("ASYNC NOW! OWHU~");
+                TcpConnection* conn = (TcpConnection*)cqe->user_data;
+                conn->handleReadLater(cqe->res);
+                io_uring_cqe_seen(&read_ring_,cqe);
+            }
             eventHanding_= false;
             callPendingFunction();
         }
-        LOG_TRACE<<"EventLoop " <<this<<" stop looping ";
+//        LOG_TRACE<<"EventLoop " <<this<<" stop looping ";
         looping_= false;
 
     }
@@ -61,7 +73,7 @@ namespace mal{
 
     void EventLoop::abortNotInLoopThread() {
 
-        LOG_FATAL<<"EVENTLOOP OBJECT NOT IN LOOP THREAD";
+//        LOG_FATAL<<"EVENTLOOP OBJECT NOT IN LOOP THREAD";
         std::exit(1);
     }
 

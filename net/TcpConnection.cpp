@@ -8,22 +8,30 @@
 #include"InetAddress.h"
 #include<string>
 #include"EventLoop.h"
-#include<muduo/base/Logging.h>
 #include "SocketsOps.h"
 #include "HttpContext.h"
 #include"TimeStamp.h"
+#include"log.h"
 namespace mal{
 
-    void TcpConnection::handleRead() {
+    void TcpConnection::handleRead(io_uring& read_ring) {
+        CONSOLE_INFO("handlerRead");
         int savedError=0;
-        ssize_t  n = inputBuffer_.readFd(channel_->fd(),&savedError);
+        auto sqe = inputBuffer_.readFd(channel_->fd(),&savedError,read_ring);
+        io_uring_sqe_set_data(sqe,this);
+
+
+    }
+    void TcpConnection::handleReadLater(int n){
+        inputBuffer_.readFdLater(n);
         if(n>0)
             messageCallback_(shared_from_this(),&inputBuffer_,TimeStamp());
         else if(n==0)
             handleClose();
         else{
-            errno=savedError;
-            LOG_ERROR <<"TcpConnection::handleRead";
+//            errno=savedError;
+            CONSOLE_DEBUG(" void TcpConnection::handleReadLater(int n) error ")
+//            LOG_ERROR <<"TcpConnection::handleRead";
             handleError();
         }
     }
@@ -50,7 +58,7 @@ namespace mal{
                                  state_(Connecting){
         channel_->setReadCallback(
                 std::bind(&TcpConnection::handleRead,
-                          this));
+                          this,std::placeholders::_1));
         channel_->setCloseCallback(std::bind(&TcpConnection::handleClose,
                                              this));
         channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite,this));
@@ -94,27 +102,27 @@ namespace mal{
                     if(state_=Disconnecting)
                         shutdownInLoop();
                 }else{
-                    LOG_TRACE<<"need send writing more ...";
+//                    LOG_TRACE<<"need send writing more ...";
                 }
             }else{
-                LOG_SYSERR<<"TcpConnection::handleWrite()";
+//                LOG_SYSERR<<"TcpConnection::handleWrite()";
             }
         }else{
-            LOG_TRACE<<"connection will destory,no more writing";
+//            LOG_TRACE<<"connection will destory,no more writing";
         }
     }
 
     void TcpConnection::handleClose() {
         loop_->assertInLoopThread();
-        LOG_TRACE <<"TcpConnection::handleClose state = "<<state_;
+//        LOG_TRACE <<"TcpConnection::handleClose state = "<<state_;
         assert(state_==Connected || state_==Disconnecting);
         channel_->disableAll();
         closeCallback_(shared_from_this());
     }
 
     void TcpConnection::handleError() {
-        LOG_ERROR<<"TcpConnection::handleError ["<<name_
-                <<"] - SO_ERROR = " <<sockets::getSockErr(channel_->fd())<<" ";
+//        LOG_ERROR<<"TcpConnection::handleError ["<<name_
+//                <<"] - SO_ERROR = " <<sockets::getSockErr(channel_->fd())<<" ";
     }
 
     TcpConnection::~TcpConnection() {
@@ -198,7 +206,7 @@ namespace mal{
         bool faultError = false;
         if (state_ == Disconnected)
         {
-            LOG_WARN << "disconnected, give up writing";
+//            LOG_WARN << "disconnected, give up writing";
             return;
         }
         // if no thing in output queue, try writing directly
@@ -218,7 +226,7 @@ namespace mal{
                 nwrote = 0;
                 if (errno != EWOULDBLOCK)
                 {
-                    LOG_SYSERR << "TcpConnection::sendInLoop";
+//                    LOG_SYSERR << "TcpConnection::sendInLoop";
                     if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
                     {
                         faultError = true;
@@ -238,6 +246,7 @@ namespace mal{
 //            {
 //                loop_->queueInLoop(std::bind(highWaterMarkCallback_, shared_from_this(), oldLen + remaining));
 //            }
+
             outputBuffer_.append(data+nwrote, remaining);
             if (!channel_->isWriting())
             {

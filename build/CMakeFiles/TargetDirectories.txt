@@ -1,0 +1,15 @@
+/home/rain/src/muduo/malIO_uring/build/CMakeFiles/main.dir
+/home/rain/src/muduo/malIO_uring/build/CMakeFiles/test.dir
+/home/rain/src/muduo/malIO_uring/build/CMakeFiles/io_uring_test.dir
+/home/rain/src/muduo/malIO_uring/build/CMakeFiles/cxx_20_coroutine_test.dir
+/home/rain/src/muduo/malIO_uring/build/CMakeFiles/edit_cache.dir
+/home/rain/src/muduo/malIO_uring/build/CMakeFiles/rebuild_cache.dir
+/home/rain/src/muduo/malIO_uring/build/Http/CMakeFiles/mal_http.dir
+/home/rain/src/muduo/malIO_uring/build/Http/CMakeFiles/edit_cache.dir
+/home/rain/src/muduo/malIO_uring/build/Http/CMakeFiles/rebuild_cache.dir
+/home/rain/src/muduo/malIO_uring/build/base/CMakeFiles/mal_base.dir
+/home/rain/src/muduo/malIO_uring/build/base/CMakeFiles/edit_cache.dir
+/home/rain/src/muduo/malIO_uring/build/base/CMakeFiles/rebuild_cache.dir
+/home/rain/src/muduo/malIO_uring/build/net/CMakeFiles/mal_net.dir
+/home/rain/src/muduo/malIO_uring/build/net/CMakeFiles/edit_cache.dir
+/home/rain/src/muduo/malIO_uring/build/net/CMakeFiles/rebuild_cache.dir

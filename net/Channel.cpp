@@ -4,7 +4,6 @@
 
 #include "Channel.h"
 #include<sys/poll.h>
-#include<muduo/base/Logging.h>
 #include"EventLoop.h"
 namespace mal{
     const int Channel::kNoneEvent = 0;
@@ -23,18 +22,18 @@ namespace mal{
     void Channel::handleEvent() {
         eventHanding_=true;
         if(revents_ & POLLNVAL)
-            LOG_WARN <<"Channel::handleEvent() POLLNVAL";
+//            LOG_WARN <<"Channel::handleEvent() POLLNVAL";
         if(revents_ & (POLLERR | POLLNVAL))
             if(errorCallback_) errorCallback_();
         if(revents_ & (POLLNVAL | POLLIN | POLLRDHUP))
-            if(readCallback_) readCallback_();
+            if(readCallback_) readCallback_(t_loopInThisThread->read_ring_);
         if(revents_ & POLLOUT)
             if(writeCallback_) writeCallback_();
 
         eventHanding_= false;
     }
 
-    void Channel::setReadCallback(const Channel::EventCallback &cb) {
+    void Channel::setReadCallback(const Channel::ReadEventCallback &cb) {
             readCallback_=cb;
     }
 

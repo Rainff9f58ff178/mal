@@ -4,7 +4,6 @@
 
 #include "Poller.h"
 #include<sys/poll.h>
-#include<muduo/base/Logging.h>
 #include"EventLoop.h"
 #include"Type.h"
 mal::Poller::Poller(EventLoop *loop):
@@ -16,19 +15,19 @@ mal::Poller::~Poller() {
 
 }
 
-muduo::Timestamp mal::Poller::poll(int timeoutMs,
+mal::TimeStamp mal::Poller::poll(int timeoutMs,
                       mal::Poller::ChannelList *activeChannels) {
     int numEvents = ::poll(&*pollfds_.begin(),
                            pollfds_.size(),
                            timeoutMs);
-    muduo::Timestamp now(muduo::Timestamp::now());
+    mal::TimeStamp now(mal::TimeStamp::nowMicroSecond());
     if(numEvents>0){
-        LOG_TRACE << numEvents <<" events happended";
+//        LOG_TRACE << numEvents <<" events happended";
         fillActiveChannels(numEvents,activeChannels);
     } else if(numEvents==0){
-        LOG_TRACE<<"nothing happended";
+//        LOG_TRACE<<"nothing happended";
     }else{
-        LOG_SYSERR<<"Poller::poll()";
+//        LOG_SYSERR<<"Poller::poll()";
     }
 
     return now;
@@ -36,7 +35,7 @@ muduo::Timestamp mal::Poller::poll(int timeoutMs,
 
 void mal::Poller::updateChannel(mal::Channel *channel) {
     assertInLoopThread();
-    LOG_TRACE<<"fd =" <<channel->fd() <<"events = " <<channel->events();
+//    LOG_TRACE<<"fd =" <<channel->fd() <<"events = " <<channel->events();
     if(channel->index() <0 ){
         //new one
         assert(channels_map_.find(channel->fd()) == channels_map_.end());

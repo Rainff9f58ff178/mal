@@ -1,0 +1,2 @@
+/usr/bin/ar qc /home/rain/src/muduo/malIO_uring/lib/libmal_base.a CMakeFiles/mal_base.dir/Thread.cpp.o CMakeFiles/mal_base.dir/TimeStamp.cpp.o CMakeFiles/mal_base.dir/log.cpp.o
+/usr/bin/ranlib /home/rain/src/muduo/malIO_uring/lib/libmal_base.a

@@ -10,17 +10,18 @@
 #include<boost/noncopyable.hpp>
 #include<chrono>
 #include<map>
-#include<muduo/base/Timestamp.h>
+#include<TimeStamp.h>
+
 namespace mal{
 
     class Channel;
-
+    class EventLoop;
     class Poller:boost::noncopyable {
     public:
         typedef std::vector<Channel*> ChannelList;
         Poller(EventLoop* loop);
         ~Poller();
-        muduo::Timestamp poll(
+        mal::TimeStamp poll(
                 int timeoutMs,
                 ChannelList* activeChannels);
         void updateChannel(Channel* channel);

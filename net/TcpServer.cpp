@@ -4,7 +4,6 @@
 
 #include "TcpServer.h"
 #include"EventLoop.h"
-#include"muduo/base/Logging.h"
 #include<iostream>
 namespace mal{
 
@@ -31,9 +30,9 @@ namespace mal{
         snprintf(buf,sizeof buf,"#%d",nextConnId_);
         ++nextConnId_;
         std::string connName = name_+buf;
-        LOG_INFO << "TcpServer::newConnection [" << name_
-                 << "] - new connection [" << connName
-                 << "] from " << addr.toIpPort();
+//        LOG_INFO << "TcpServer::newConnection [" << name_
+//                 << "] - new connection [" << connName
+//                 << "] from " << addr.toIpPort();
 
         //setMessageCallback,and call connectEstablished
         InetAddress localAddr(sockets::getLocalAddr(sockfd));
@@ -71,8 +70,8 @@ namespace mal{
     }
     void TcpServer::removeConnectionInLoop(const TcpConnectionPtr &tcpConnection) {
         loop_->assertInLoopThread();
-        LOG_INFO <<"TcpServer::removeConnectionInLoop["<<name_
-        <<"]-connection" <<tcpConnection->name();
+//        LOG_INFO <<"TcpServer::removeConnectionInLoop["<<name_
+//        <<"]-connection" <<tcpConnection->name();
 
         size_t n =connections_.erase(tcpConnection->name());
         assert(n==1);

@@ -7,6 +7,7 @@
 #include"Buffer.h"
 #include<cassert>
 #include<algorithm>
+#include"log.h"
 namespace mal{
 
     HttpContext::HttpContext():state_(parsingRequestLine) {
@@ -112,6 +113,8 @@ namespace mal{
                     int len=std::stoi(len_s);
                     if(static_cast<int>(buffer->readableBytes()) >= len){
                         std::string body=buffer->retrieveAsString(len);
+                        CONSOLE_INFO("BODY:");
+                        CONSOLE_INFO(body.data());
                         state_=GotAll;
                     }else
                         hasMore= false;
